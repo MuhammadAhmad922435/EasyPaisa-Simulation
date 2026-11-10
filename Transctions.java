@@ -1,3 +1,4 @@
+import java.util.UUID;
 class Transctions{
     static class Node{
 
@@ -48,7 +49,7 @@ public String getStatus() {
 
             static Node Front;
             static Node Rear;
-            public static void Enqueue(String tId , String source ,String target , String type ,double amount){
+            public  void Enqueue(String tId , String source ,String target , String type ,double amount){
                 Node n = new Node(tId, source, target, amount, type);
                 if(isEmpty()){
                     Front  = n;
@@ -82,6 +83,12 @@ public String getStatus() {
 
             public static boolean isEmpty(){
                 return Front == null;
+            }
+            public static void StartTransctions(){
+                Admin.ProcessTransction();
+            }
+            public static String generateTransactionId() {
+                 return UUID.randomUUID().toString();
             }
             
 

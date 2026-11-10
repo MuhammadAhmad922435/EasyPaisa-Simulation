@@ -5,8 +5,8 @@ class Maintest{
         Users acc = new Users();
         acc.push(a1, a1.getAccountNo());
         acc.display();
-       acc.pop("A13e");
-       acc.display();
+       a1.transferOp("A13E", 40000);
+       Transctions.StartTransctions();
     
         
 

@@ -38,6 +38,9 @@ public static void ProcessTransction(){
                         process.status = "Failed due to low balance";
                         
                     }
+                    else if(transferMoney>process.getAmount()){
+                        process.status = "Canceled . Your balance is low";
+                    }
                     else{
                         result = Users.deposit(process.target, transferMoney);
                     }

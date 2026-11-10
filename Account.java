@@ -40,5 +40,20 @@ class Account{
                "Account Holder Name :"+ Name+ "\n" + 
                "Account Balance :"+ Account_Balance;  
     }
+    public void withdrawOp(double balance){
+        String tid = Transctions.generateTransactionId();
+        Transctions t = new Transctions();
+        t.Enqueue(tid, this.getAccountNo(), this.getAccountNo(), "withdraw",balance );
+    }
+    public void depositOp(double balance){
+        String tid = Transctions.generateTransactionId();
+        Transctions t = new Transctions();
+        t.Enqueue(tid, this.getAccountNo(),this.getAccountNo(), "deposit", balance);
+    }
+    public void transferOp(String target, double balance){
+        String tid = Transctions.generateTransactionId();
+        Transctions t = new Transctions();
+        t.Enqueue(tid, this.getAccountNo(), target, "Transfer", balance);
+    }
 
 }
