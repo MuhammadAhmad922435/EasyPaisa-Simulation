@@ -1,69 +1,73 @@
-class Admin{
-public static void ProcessTransction(){
-                Transctions.Node process = Transctions.Dequeue();
-                if(process == null){
-                    System.out.println("There is no Transction At this time");
-                    return;
-                }
-                if(process.type.equalsIgnoreCase("withdraw")){
-                    process.target = null;
-                    double balance = Users.withdraw(process.source, process.amount);
-                    if(balance > 0){
-                        process.status = "Successfull";
-                    }
-                    else if(balance == 0){
-                        process.status = "Failed Due to Low Balance";
-                    }
-                    else if(balance == -1){
-                        process.status = "Canceled . Account doesnt Exists";
-                    }
-                }
-                else if(process.type.equalsIgnoreCase("deposit")){
-                    process.target = null;
-                    boolean result = Users.deposit(process.source, process.amount);
-                    if(result){
-                        process.status = " Successfull";
-                    }
-                    else{
-                        process.status = "Failed due to Invalid balance or Account not found";
-                    }
-                }
-                else if(process.type.equalsIgnoreCase("transfer")){
-                    boolean result = false;
-                    double transferMoney = Users.withdraw(process.source, process.amount);
-                    if(transferMoney < 0){
-                        process.status = "Canceled . Account doesnt Exists";
-                    }
-                    else if(transferMoney == 0){
-                        process.status = "Failed due to low balance";
-                        
-                    }
-                    else if(transferMoney>process.getAmount()){
-                        process.status = "Canceled . Your balance is low";
-                    }
-                    else{
-                        result = Users.deposit(process.target, transferMoney);
-                    }
-                    
-                    if(result){
-                        process.status = "Successfull";
-                    }
-                    else{
-                        Users.deposit(process.source, transferMoney);
-                        process.status = "Failed . Account Doesnt Exists";
-                    }
-                }
-                else{
-                    System.out.println("please Choose Correct Option");
-                }
 
+class Admin {
 
+    public static void ProcessTransction() {
 
-                System.out.println("Transction Id : "+process.getTransctionId());
-                System.out.println("Source : "+ process.getSource());
-                System.out.println("Target : "+ process.getTarget());
-                System.out.println("Type : "+ process.getType());
-                System.out.println("Amount : "+ process.getAmount());
-                System.out.println("Status : "+ process.getStatus());
+        Transctions.Node process = Transctions.Dequeue();
+
+        if (process == null) {
+            System.out.println("There is no Transaction at this time.");
+            return;
+        }
+
+        if (process.type.equalsIgnoreCase("withdraw")) {
+
+            double balance = Users.withdraw(
+                    process.source,
+                    process.amount
+            );
+
+            if (balance > 0) {
+                process.status = "Successful";
+            } else if (balance == 0) {
+                process.status = "Failed: Insufficient balance or invalid amount";
+            } else {
+                process.status = "Failed: Source account does not exist";
             }
+        }
+
+        else if (process.type.equalsIgnoreCase("deposit")) {
+
+            boolean result = Users.deposit(
+                    process.source,
+                    process.amount
+            );
+
+            if (result) {
+                process.status = "Successful";
+            } else {
+                process.status = "Failed: Invalid amount or account not found";
+            }
+        }
+
+        else if (process.type.equalsIgnoreCase("transfer")) {
+
+            boolean result = Users.transfer(
+                    process.source,
+                    process.target,
+                    process.amount
+            );
+
+            if (result) {
+                process.status = "Successful";
+            } else {
+                process.status = "Failed: Transfer could not be completed";
+            }
+        }
+
+        else {
+            process.status = "Failed: Invalid transaction type";
+        }
+
+        System.out.println("\n------ Transaction Result ------");
+        System.out.println("Transaction ID : " + process.getTransctionId());
+        System.out.println("Source         : " + process.getSource());
+        System.out.println("Target         : " + process.getTarget());
+        System.out.println("Type           : " + process.getType());
+        System.out.println("Amount         : " + process.getAmount());
+        System.out.println("Status         : " + process.getStatus());
+        System.out.println("--------------------------------");
+
+        TransactionHistory.store(process);
+    }
 }

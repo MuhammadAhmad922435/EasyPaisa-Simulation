@@ -1,139 +1,270 @@
-class Users{
-    static class Node{
-    private Account user;
-    public String Account_Id;
-    Node next;
-    Node prev;
-    public String getAccountId(){
-        return user.getAccountNo();
-    }
-    public Account getUser(){
-        return user;
-    }
-    public Node(Account user ,String Account_Id){
-        this.user = user;
-        this.Account_Id = Account_Id;
-        this.next = null;
-        this.prev = null;
+
+class Users {
+
+    static class Node {
+
+        private Account user;
+        public String Account_Id;
+        Node next;
+        Node prev;
+
+        public String getAccountId() {
+            return user.getAccountNo();
+        }
+
+        public Account getUser() {
+            return user;
+        }
+
+        public Node(Account user, String Account_Id) {
+            this.user = user;
+            this.Account_Id = Account_Id;
+            this.next = null;
+            this.prev = null;
+        }
     }
 
-}
-static Node Head;
-static Node tail;
+    static Node Head;
+    static Node tail;
 
-    public static void push(Account user, String Account_Id){
+    public static void push(Account user, String Account_Id) {
+
+        if (user == null) {
+            System.out.println("Invalid Account");
+            return;
+        }
+
+        if (accountExists(Account_Id)) {
+            System.out.println("Account Already Exists");
+            return;
+        }
+
         Node n = new Node(user, Account_Id);
-        if(isEmpty()){
+
+        if (isEmpty()) {
             Head = n;
             tail = n;
             return;
         }
+
         tail.next = n;
         n.prev = tail;
-        tail = tail.next;
+        tail = n;
     }
-    public static  String pop(String  Account_Id){
+
+    public static String pop(String Account_Id) {
+
         Node curr = Head;
-        Node back;
-        String id;
-        if(isEmpty()){
+
+        if (isEmpty()) {
             return "No account Exists in Application";
         }
-        while(curr != null){
-        if(curr.getAccountId().equals(Account_Id)){
-            if(curr == Head && curr == tail){
-                id = curr.getAccountId();
-                Head = null;
-                tail =null;
-                return id;
-            }
-            if(curr == Head){
-                if(Head.next != null){
-                    id = Head.getAccountId();
-                    Head= Head.next;
-                    Head.prev = null;
-                    return id;
+
+        while (curr != null) {
+
+            if (curr.getAccountId().equals(Account_Id)) {
+
+                if (curr.prev == null) {
+                    Head = curr.next;
+                } else {
+                    curr.prev.next = curr.next;
                 }
-            }
-            else if(curr == tail){
-                if(tail.prev != null){
-                    id = tail.getAccountId();
-                    tail = tail.prev;
-                    tail.next = null;
-                    return id;
+
+                if (curr.next == null) {
+                    tail = curr.prev;
+                } else {
+                    curr.next.prev = curr.prev;
                 }
-            }
-            else{
-                back = curr.prev;
-                back.next = curr.next;
-                curr.next.prev = back;
+
+                String id = curr.getAccountId();
+
                 curr.next = null;
                 curr.prev = null;
-                return curr.getAccountId();
+
+                return id;
             }
 
-        }
             curr = curr.next;
+        }
+
+        return "No Account Found With These Credentials";
     }
-    return "No Account Found With These Credentials";
-}
-public static boolean isEmpty(){
-    return Head == null;
-}
-public static void display(){
-    if(isEmpty()){
-        System.out.println("Nothing to print");
-        return;
+
+    public static boolean isEmpty() {
+        return Head == null;
     }
-Node curr = Head;
-    while(curr !=null){
-        System.out.println(curr.user);
-        curr = curr.next;
+
+    public static boolean accountExists(String Account_Id) {
+
+        if (Account_Id == null) {
+            return false;
+        }
+
+        Node curr = Head;
+
+        while (curr != null) {
+
+            if (curr.getAccountId().equals(Account_Id)) {
+                return true;
+            }
+
+            curr = curr.next;
+        }
+
+        return false;
     }
-}
-public static double withdraw(String AccountId ,double balance){
-Node curr = Head;
-while(curr != null){
-if(curr.getAccountId().equals(AccountId)){
-    if(curr.getUser().withdraw(balance)){
-        System.out.println("withdraw Successfully");
-        return balance;
-    }else{
-        System.out.println("Invalid Balance");
-     return 0;
-        
-    }
-}
-    curr = curr.next;
-}
-    return -1;
-}
-public static boolean deposit(String AccountId ,double balance){
-Node curr = Head;
-if(balance <= 0){
-     System.out.println("Invalid balance");
-     return false;
-}
-while(curr != null){
-if(curr.getAccountId().equals(AccountId)){
-    curr.getUser().deposit(balance);
-    System.out.println("deposited Successfully");   
-    return true; 
-    }
-    curr = curr.next;
-}
-return false;
-}
-public static void findById(String Id){
-    Node curr = Head;
-    while(curr !=null){
-        if(curr.getAccountId().equals(Id)){
-            System.out.println("Found!.....\n"+ curr.getUser());
+
+    public static void display() {
+
+        if (isEmpty()) {
+            System.out.println("Nothing to print");
             return;
         }
-        curr = curr.next;
-    }
-    System.out.println("No Data Found With This Id");
-}
 
+        Node curr = Head;
+
+        while (curr != null) {
+            System.out.println(curr.getUser());
+            System.out.println("----------------------");
+            curr = curr.next;
+        }
+    }
+
+    public static double withdraw(String AccountId, double balance) {
+
+        Node curr = Head;
+
+        if (!Double.isFinite(balance) || balance <= 0) {
+            System.out.println("Invalid Balance");
+            return 0;
+        }
+
+        while (curr != null) {
+
+            if (curr.getAccountId().equals(AccountId)) {
+
+                if (curr.getUser().withdraw(balance)) {
+                    System.out.println("Withdraw Successfully");
+                    return balance;
+                } else {
+                    System.out.println("Insufficient Balance");
+                    return 0;
+                }
+            }
+
+            curr = curr.next;
+        }
+
+        return -1;
+    }
+
+    public static boolean deposit(String AccountId, double balance) {
+
+        if (!Double.isFinite(balance) || balance <= 0) {
+            System.out.println("Invalid Balance");
+            return false;
+        }
+
+        Node curr = Head;
+
+        while (curr != null) {
+
+            if (curr.getAccountId().equals(AccountId)) {
+
+                double newBalance =
+                        curr.getUser().getAccountBalance() + balance;
+
+                if (!Double.isFinite(newBalance)) {
+                    System.out.println("Invalid Deposit Amount");
+                    return false;
+                }
+
+                curr.getUser().deposit(balance);
+
+                System.out.println("Deposited Successfully");
+                return true;
+            }
+
+            curr = curr.next;
+        }
+
+        return false;
+    }
+
+    public static boolean transfer(String sourceId,
+                                   String targetId,
+                                   double amount) {
+
+        if (!Double.isFinite(amount) || amount <= 0) {
+            System.out.println("Invalid Transfer Amount");
+            return false;
+        }
+
+        Node source = Head;
+        Node target = Head;
+
+        while (source != null
+                && !source.getAccountId().equals(sourceId)) {
+            source = source.next;
+        }
+
+        while (target != null
+                && !target.getAccountId().equals(targetId)) {
+            target = target.next;
+        }
+
+        if (source == null) {
+            System.out.println("Source Account Not Found");
+            return false;
+        }
+
+        if (target == null) {
+            System.out.println("Target Account Not Found");
+            return false;
+        }
+
+        if (source == target) {
+            System.out.println("Cannot Transfer To The Same Account");
+            return false;
+        }
+
+        double sourceBalance =
+                source.getUser().getAccountBalance();
+
+        double targetBalance =
+                target.getUser().getAccountBalance();
+
+        if (sourceBalance < amount) {
+            System.out.println("Insufficient Balance");
+            return false;
+        }
+
+        if (!Double.isFinite(targetBalance + amount)) {
+            System.out.println("Invalid Transfer Amount");
+            return false;
+        }
+
+        source.getUser().withdraw(amount);
+        target.getUser().deposit(amount);
+
+        System.out.println("Transfer Successfully");
+        return true;
+    }
+
+    public static void findById(String Id) {
+
+        Node curr = Head;
+
+        while (curr != null) {
+
+            if (curr.getAccountId().equals(Id)) {
+                System.out.println("Found!.....\n" + curr.getUser());
+                return;
+            }
+
+            curr = curr.next;
+        }
+
+        System.out.println("No Data Found With This Id");
+    }
 }
